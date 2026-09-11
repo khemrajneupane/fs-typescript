@@ -15,7 +15,7 @@ const parseArguments = (args: string[]): heightWeight => {
     throw new Error("Provided values were not numbers!");
   }
 };
-const calculateBmi = (height: number, weight: number): string => {
+export const calculateBmi = (height: number, weight: number): string => {
   const height_in_meters = height / 100;
   const bmi = weight / (height_in_meters * height_in_meters);
 
@@ -37,13 +37,15 @@ const calculateBmi = (height: number, weight: number): string => {
     return "Obese (Class III)";
   }
 };
-try {
-  const { height, weight } = parseArguments(process.argv);
-  console.log(calculateBmi(height, weight));
-} catch (error: unknown) {
-  let errorMessage = "Something happened";
-  if (error instanceof Error) {
-    errorMessage += "Error: " + error.message;
+if (process.argv[1] === import.meta.filename) {
+  try {
+    const { height, weight } = parseArguments(process.argv);
+    console.log(calculateBmi(height, weight));
+  } catch (error: unknown) {
+    let errorMessage = "Something happened";
+    if (error instanceof Error) {
+      errorMessage += "Error: " + error.message;
+    }
+    console.log(errorMessage);
   }
-  console.log(errorMessage);
 }
