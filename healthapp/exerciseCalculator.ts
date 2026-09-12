@@ -30,7 +30,7 @@ const calculateExercises = (target: number, daily_hours: number[]): Result => {
   const periodLength = daily_hours.length;
   const trainingDays = daily_hours.reduce(
     (accumulator, currentValue) =>
-      currentValue > 0 ? (accumulator += 1) : accumulator,
+      currentValue > 0 ? accumulator + 1 : accumulator,
     0,
   );
   const totalHours = daily_hours.reduce(
