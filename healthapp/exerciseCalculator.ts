@@ -26,7 +26,10 @@ const parseArgs = (args: string[]): ArgsTypes => {
     dailyHours,
   };
 };
-const calculateExercises = (target: number, daily_hours: number[]): Result => {
+export const calculateExercises = (
+  target: number,
+  daily_hours: number[],
+): Result => {
   const periodLength = daily_hours.length;
   const trainingDays = daily_hours.reduce(
     (accumulator, currentValue) =>
@@ -49,7 +52,7 @@ const calculateExercises = (target: number, daily_hours: number[]): Result => {
     ratingDescription = "not too bad but could be better";
   } else {
     rating = 1;
-    ratingDescription = "poor performance";
+    ratingDescription = "bad";
   }
   return {
     periodLength,
@@ -61,13 +64,15 @@ const calculateExercises = (target: number, daily_hours: number[]): Result => {
     average,
   };
 };
-try {
-  const { target, dailyHours } = parseArgs(process.argv.slice(2));
-  console.log(calculateExercises(target, dailyHours));
-} catch (error: unknown) {
-  let errorMessage = "Something happened";
-  if (error instanceof Error) {
-    errorMessage += "Error: " + error.message;
+if (process.argv[1] === import.meta.filename) {
+  try {
+    const { target, dailyHours } = parseArgs(process.argv.slice(2));
+    console.log(calculateExercises(target, dailyHours));
+  } catch (error: unknown) {
+    let errorMessage = "Something happened";
+    if (error instanceof Error) {
+      errorMessage += "Error: " + error.message;
+    }
+    console.log(errorMessage);
   }
-  console.log(errorMessage);
 }
