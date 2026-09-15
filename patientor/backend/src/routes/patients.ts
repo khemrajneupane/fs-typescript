@@ -1,7 +1,12 @@
-import express, { type Response } from "express";
-import type { NonSensitivePatient } from "../types.ts";
+import express, { type Request, type Response } from "express";
+import type {
+  NonSensitivePatient,
+  Patient,
+  PatientWithoutID,
+} from "../types.ts";
 import patientService from "../services/patientService.ts";
-import { isPatientWithoutId } from "../utils.ts";
+
+import { errorMiddleware, newPatientParser } from "../middleware.ts";
 
 const router = express.Router();
 
@@ -10,15 +15,16 @@ router.get("/", (_req, res: Response<NonSensitivePatient[]>) => {
   res.send(nonsensitivePatients);
 });
 
-router.post("/", (req, res) => {
-  const body: unknown = req.body;
-  if (!isPatientWithoutId(body)) {
-    return res.status(400).json({
-      error: "Improper patient formatting!",
-    });
-  }
-  const addPatient = patientService.addPatient(body);
-  return res.send(addPatient);
-});
-
+router.post(
+  "/",
+  newPatientParser,
+  (
+    req: Request<unknown, unknown, PatientWithoutID>,
+    res: Response<Patient>,
+  ) => {
+    const addPatient = patientService.addPatient(req.body);
+    return res.send(addPatient);
+  },
+);
+router.use(errorMiddleware);
 export default router;
