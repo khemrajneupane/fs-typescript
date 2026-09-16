@@ -1,7 +1,7 @@
-import type { NonSensitiveDiaryEntry } from "../types";
+import type { DiaryEntry } from "../types";
 
 export interface DiaryListProps {
-  diaries: NonSensitiveDiaryEntry[];
+  diaries: DiaryEntry[];
 }
 
 const DiaryList = (props: DiaryListProps) => {
