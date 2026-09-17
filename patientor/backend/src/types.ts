@@ -14,7 +14,8 @@ export const Gender = {
 export type GenderType = (typeof Gender)[keyof typeof Gender];
 
 export const GenderSchema = z.enum([Gender.Male, Gender.Female, Gender.Other]);
-
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface Entry {}
 export interface Patient {
   id: string;
   name: string;
@@ -22,6 +23,7 @@ export interface Patient {
   ssn: string;
   gender: GenderType;
   occupation: string;
+  entries: Entry[];
 }
 
 export const NewPatientSchema = z.object({
@@ -33,4 +35,4 @@ export const NewPatientSchema = z.object({
 });
 
 export type PatientWithoutID = z.infer<typeof NewPatientSchema>;
-export type NonSensitivePatient = Omit<Patient, "ssn">;
+export type NonSensitivePatient = Omit<Patient, "ssn" | "entries">;
