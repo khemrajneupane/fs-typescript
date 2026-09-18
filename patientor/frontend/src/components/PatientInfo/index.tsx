@@ -6,11 +6,13 @@ import { Box, Paper, Typography } from "@mui/material";
 import MaleIcon from "@mui/icons-material/Male";
 import FemaleIcon from "@mui/icons-material/Female";
 import TransgenderIcon from "@mui/icons-material/Transgender";
+import EntryDetails from "../EntryDetails";
 
 interface DiagnosesProps {
   diagnoses: Diagnosis[];
 }
 const PatientInfo = ({ diagnoses }: DiagnosesProps) => {
+  console.log(diagnoses);
   const [patient, setPatient] = useState<Patient | null>(null);
   const { id } = useParams();
 
@@ -51,23 +53,11 @@ const PatientInfo = ({ diagnoses }: DiagnosesProps) => {
       )}
       {patient.entries.map((entry: Entry) => {
         return (
-          <Box sx={{ marginTop: 2 }} key={entry.id}>
-            <Typography>
-              {entry.date}{" "}
-              <span style={{ fontStyle: "italic" }}> {entry.description}</span>
-            </Typography>
-            <ul>
-              {entry.diagnosisCodes?.map((code) => {
-                const diagnosesMatch = diagnoses.find(
-                  (diagnosis) => diagnosis.code === code,
-                );
-                return (
-                  <li key={code}>
-                    {code} {diagnosesMatch?.name}
-                  </li>
-                );
-              })}
-            </ul>
+          <Box
+            sx={{ marginTop: 2, border: "1px solid black", borderRadius: 1 }}
+            key={entry.id}
+          >
+            <EntryDetails entry={entry} />
           </Box>
         );
       })}
