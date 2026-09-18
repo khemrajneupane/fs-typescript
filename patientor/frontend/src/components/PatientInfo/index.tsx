@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Gender, type Patient } from "../../types";
+import { Entry, Gender, type Patient } from "../../types";
 import patientService from "../../services/patients";
 import { Box, Paper, Typography } from "@mui/material";
 import MaleIcon from "@mui/icons-material/Male";
@@ -36,13 +36,30 @@ const PatientInfo = () => {
         {patient.name} {genderIcon(patient.gender)}
       </Typography>
 
-      <Box sx={{ marginTop: 3 }}>
+      <Box sx={{ marginTop: 3, marginBottom: 3 }}>
         <Typography>ssn: {patient.ssn}</Typography>
 
         <Typography>ocupation: {patient.occupation}</Typography>
-
-        <Typography>date of birth: {patient.dateOfBirth}</Typography>
       </Box>
+
+      {patient.entries.length > 0 && (
+        <Typography sx={{ fontWeight: "bold" }}>entries</Typography>
+      )}
+      {patient.entries.map((entry: Entry) => {
+        return (
+          <Box sx={{ marginTop: 2 }} key={entry.id}>
+            <Typography>
+              {entry.date}{" "}
+              <span style={{ fontStyle: "italic" }}> {entry.description}</span>
+            </Typography>
+            <ul>
+              {entry.diagnosisCodes?.map((codes) => {
+                return <li key={codes}>{codes}</li>;
+              })}
+            </ul>
+          </Box>
+        );
+      })}
     </Paper>
   );
 };
