@@ -1,4 +1,6 @@
 import type {
+  Entry,
+  EntryWithoutId,
   NonSensitivePatient,
   Patient,
   PatientWithoutID,
@@ -19,7 +21,21 @@ const getNonSensitivePatients = (): NonSensitivePatient[] => {
     occupation,
   }));
 };
-
+const addEntry = (
+  entry: EntryWithoutId,
+  patientId: string,
+): Entry | undefined => {
+  const addEntryToThisPatient = getPatientById(patientId);
+  if (!addEntryToThisPatient) {
+    return undefined;
+  }
+  const newEntry = {
+    id: uuid(),
+    ...entry,
+  };
+  addEntryToThisPatient.entries.push(newEntry);
+  return newEntry;
+};
 const addPatient = (entry: PatientWithoutID): Patient => {
   const id = uuid();
   const newPatientEntry = {
@@ -36,4 +52,5 @@ export default {
   getNonSensitivePatients,
   addPatient,
   getPatientById,
+  addEntry,
 };

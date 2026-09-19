@@ -3,7 +3,9 @@ import type {
   NonSensitivePatient,
   Patient,
   PatientWithoutID,
+  EntryWithoutId,
 } from "../types.ts";
+import { EntrySchema } from "../types.ts";
 import patientService from "../services/patientService.ts";
 
 import { errorMiddleware, newPatientParser } from "../middleware.ts";
@@ -32,6 +34,22 @@ router.post(
   ) => {
     const addPatient = patientService.addPatient(req.body);
     return res.send(addPatient);
+  },
+);
+router.post(
+  "/:id/entries",
+  (req: Request<{ id: string }, unknown, EntryWithoutId>, res: Response) => {
+    const result = EntrySchema.safeParse(req.body);
+    if (!result.success) {
+      return res.status(400).json(result.error);
+    }
+    const entry = result.data;
+
+    const newEntry = patientService.addEntry(entry, req.params.id);
+    if (!newEntry) {
+      return res.sendStatus(404);
+    }
+    return res.send(newEntry);
   },
 );
 router.use(errorMiddleware);
