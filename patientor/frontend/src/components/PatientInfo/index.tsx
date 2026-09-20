@@ -7,6 +7,7 @@ import MaleIcon from "@mui/icons-material/Male";
 import FemaleIcon from "@mui/icons-material/Female";
 import TransgenderIcon from "@mui/icons-material/Transgender";
 import EntryDetails from "../EntryDetails";
+import HealthCheckForm from "../entry-forms/HealthCheckForm";
 
 interface DiagnosesProps {
   diagnoses: Diagnosis[];
@@ -22,7 +23,14 @@ const PatientInfo = ({ diagnoses }: DiagnosesProps) => {
     }
     void patientService.getById(id).then((data) => setPatient(data));
   }, [id]);
+  const updateUI = async () => {
+    if (!id) {
+      return;
+    }
 
+    const updatedPatient = await patientService.getById(id);
+    setPatient(updatedPatient);
+  };
   if (!patient) {
     return <div>Loading patient info</div>;
   }
@@ -61,6 +69,7 @@ const PatientInfo = ({ diagnoses }: DiagnosesProps) => {
           </Box>
         );
       })}
+      <HealthCheckForm patientId={patient.id} onEntryAdded={updateUI} />
     </Paper>
   );
 };

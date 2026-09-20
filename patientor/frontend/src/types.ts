@@ -39,7 +39,7 @@ export const HealthCheckRating = {
   CriticalRisk: 3,
 } as const;
 
-type HealthCheckRating =
+export type HealthCheckRating =
   (typeof HealthCheckRating)[keyof typeof HealthCheckRating];
 
 export interface HealthCheckEntry extends BaseEntry {
