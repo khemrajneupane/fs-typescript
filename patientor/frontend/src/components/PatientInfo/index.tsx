@@ -2,12 +2,22 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Diagnosis, Entry, Gender, type Patient } from "../../types";
 import patientService from "../../services/patients";
-import { Box, Paper, Typography } from "@mui/material";
+import {
+  Box,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  Typography,
+} from "@mui/material";
 import MaleIcon from "@mui/icons-material/Male";
 import FemaleIcon from "@mui/icons-material/Female";
 import TransgenderIcon from "@mui/icons-material/Transgender";
 import EntryDetails from "../EntryDetails";
 import HealthCheckForm from "../entry-forms/HealthCheckForm";
+import HospitalForm from "../entry-forms/HospitalForm";
+import OccupationalHealthcareForm from "../entry-forms/OccupationalHealthcareForm";
 
 interface DiagnosesProps {
   diagnoses: Diagnosis[];
@@ -15,6 +25,9 @@ interface DiagnosesProps {
 const PatientInfo = ({ diagnoses }: DiagnosesProps) => {
   console.log(diagnoses);
   const [patient, setPatient] = useState<Patient | null>(null);
+  const [entryType, setEntryType] = useState<
+    "HealthCheck" | "Hospital" | "OccupationalHealthcare" | null
+  >(null);
   const { id } = useParams();
 
   useEffect(() => {
@@ -69,7 +82,44 @@ const PatientInfo = ({ diagnoses }: DiagnosesProps) => {
           </Box>
         );
       })}
-      <HealthCheckForm patientId={patient.id} onEntryAdded={updateUI} />
+
+      <FormControl fullWidth sx={{ marginTop: 3, marginBottom: 3 }}>
+        <InputLabel id="entry-type-label">Entry Type</InputLabel>
+        <Select
+          labelId="entry-type-label"
+          value={entryType ?? ""}
+          label="Entry type"
+          onChange={(event) =>
+            setEntryType(
+              event.target.value as
+                | "HealthCheck"
+                | "Hospital"
+                | "OccupationalHealthcare",
+            )
+          }
+        >
+          <MenuItem value="HealthCheck">Health Check</MenuItem>
+          <MenuItem value="Hospital">Hospital</MenuItem>
+          <MenuItem value="OccupationalHealthcare">
+            Occupational Healthcare
+          </MenuItem>
+        </Select>
+      </FormControl>
+
+      {entryType === "HealthCheck" && (
+        <HealthCheckForm patientId={patient.id} onEntryAdded={updateUI} />
+      )}
+
+      {entryType === "Hospital" && (
+        <HospitalForm patientId={patient.id} onEntryAdded={updateUI} />
+      )}
+
+      {entryType === "OccupationalHealthcare" && (
+        <OccupationalHealthcareForm
+          patientId={patient.id}
+          onEntryAdded={updateUI}
+        />
+      )}
     </Paper>
   );
 };
