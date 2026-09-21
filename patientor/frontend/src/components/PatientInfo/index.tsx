@@ -4,6 +4,7 @@ import { Diagnosis, Entry, Gender, type Patient } from "../../types";
 import patientService from "../../services/patients";
 import {
   Box,
+  Button,
   FormControl,
   InputLabel,
   MenuItem,
@@ -27,6 +28,8 @@ const PatientInfo = ({ diagnoses }: DiagnosesProps) => {
   const [entryType, setEntryType] = useState<
     "HealthCheck" | "Hospital" | "OccupationalHealthcare" | null
   >(null);
+
+  const [showEntryForm, setShowEntryForm] = useState(false);
   const { id } = useParams();
 
   useEffect(() => {
@@ -81,31 +84,44 @@ const PatientInfo = ({ diagnoses }: DiagnosesProps) => {
           </Box>
         );
       })}
-
-      <FormControl fullWidth sx={{ marginTop: 3, marginBottom: 3 }}>
-        <InputLabel id="entry-type-label">Entry Type</InputLabel>
-        <Select
-          labelId="entry-type-label"
-          value={entryType ?? ""}
-          label="Entry type"
-          onChange={(event) =>
-            setEntryType(
-              event.target.value as
-                | "HealthCheck"
-                | "Hospital"
-                | "OccupationalHealthcare",
-            )
-          }
+      {!showEntryForm && (
+        <Button
+          variant="contained"
+          sx={{ marginTop: 3 }}
+          onClick={() => {
+            setShowEntryForm(true);
+            setEntryType("HealthCheck");
+          }}
         >
-          <MenuItem value="HealthCheck">Health Check</MenuItem>
-          <MenuItem value="Hospital">Hospital</MenuItem>
-          <MenuItem value="OccupationalHealthcare">
-            Occupational Healthcare
-          </MenuItem>
-        </Select>
-      </FormControl>
+          Add New Entry
+        </Button>
+      )}
+      {showEntryForm && (
+        <FormControl fullWidth sx={{ marginTop: 3, marginBottom: 3 }}>
+          <InputLabel id="entry-type-label">Entry Type</InputLabel>
+          <Select
+            labelId="entry-type-label"
+            value={entryType ?? ""}
+            label="Entry type"
+            onChange={(event) =>
+              setEntryType(
+                event.target.value as
+                  | "HealthCheck"
+                  | "Hospital"
+                  | "OccupationalHealthcare",
+              )
+            }
+          >
+            <MenuItem value="HealthCheck">Health Check</MenuItem>
+            <MenuItem value="Hospital">Hospital</MenuItem>
+            <MenuItem value="OccupationalHealthcare">
+              Occupational Healthcare
+            </MenuItem>
+          </Select>
+        </FormControl>
+      )}
 
-      {entryType === "HealthCheck" && (
+      {showEntryForm && entryType === "HealthCheck" && (
         <HealthCheckForm
           patientId={patient.id}
           onEntryAdded={updateUI}
@@ -113,7 +129,7 @@ const PatientInfo = ({ diagnoses }: DiagnosesProps) => {
         />
       )}
 
-      {entryType === "Hospital" && (
+      {showEntryForm && entryType === "Hospital" && (
         <HospitalForm
           patientId={patient.id}
           onEntryAdded={updateUI}
@@ -121,7 +137,7 @@ const PatientInfo = ({ diagnoses }: DiagnosesProps) => {
         />
       )}
 
-      {entryType === "OccupationalHealthcare" && (
+      {showEntryForm && entryType === "OccupationalHealthcare" && (
         <OccupationalHealthcareForm
           patientId={patient.id}
           onEntryAdded={updateUI}

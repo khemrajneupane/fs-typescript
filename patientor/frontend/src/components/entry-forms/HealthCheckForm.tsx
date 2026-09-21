@@ -29,14 +29,14 @@ const HealthCheckForm = ({
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
   const [specialist, setSpecialist] = useState("");
-  const [rating, setRating] = useState("");
+  const [rating, setRating] = useState("0");
   const [error, setError] = useState("");
   const [diagnosisCodes, setDiagnosisCodes] = useState<string[]>([]);
 
   const submitForm = async (event: SyntheticEvent) => {
     event.preventDefault();
     setError("");
-    if (!description || !date || !specialist || !rating) {
+    if (!description || !date || !specialist || rating === "") {
       setError("All fields are required.");
       return;
     }
@@ -59,7 +59,7 @@ const HealthCheckForm = ({
       setDescription("");
       setDate("");
       setSpecialist("");
-      setRating("");
+      setRating("0");
       setDiagnosisCodes([]);
     } catch (error) {
       console.log("ADD ENTRY ERROR:", error);
@@ -70,7 +70,7 @@ const HealthCheckForm = ({
     setDescription("");
     setDate("");
     setSpecialist("");
-    setRating("");
+    setRating("0");
     setDiagnosisCodes([]);
   };
   return (
@@ -158,10 +158,10 @@ const HealthCheckForm = ({
         </FormControl>
         <div style={{ display: "flex", gap: "5px" }}>
           <Button type="submit" variant="contained">
-            ADD
+            Add
           </Button>
           <Button variant="outlined" onClick={() => handleCancel()}>
-            CANCEL
+            Cancel
           </Button>
         </div>
       </form>
