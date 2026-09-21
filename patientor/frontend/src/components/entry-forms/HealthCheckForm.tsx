@@ -1,7 +1,17 @@
-import { Box, Button, Paper, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  TextField,
+  Typography,
+} from "@mui/material";
 import ErrorIcon from "@mui/icons-material/Error";
 import { useState, type SyntheticEvent } from "react";
-import { HealthCheckEntry, type HealthCheckRating } from "../../types";
+import { Diagnosis, HealthCheckEntry, HealthCheckRating } from "../../types";
 import patientService from "../../services/patients";
 const isHealthCheckRating = (value: number): value is HealthCheckRating => {
   return [0, 1, 2, 3].includes(value);
@@ -9,19 +19,19 @@ const isHealthCheckRating = (value: number): value is HealthCheckRating => {
 interface HealthCheckFormProps {
   patientId: string;
   onEntryAdded: () => void;
+  diagnoses: Diagnosis[];
 }
-const HealthCheckForm = ({ patientId, onEntryAdded }: HealthCheckFormProps) => {
+const HealthCheckForm = ({
+  patientId,
+  onEntryAdded,
+  diagnoses,
+}: HealthCheckFormProps) => {
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
   const [specialist, setSpecialist] = useState("");
   const [rating, setRating] = useState("");
   const [error, setError] = useState("");
-  const [diagnosisCodes, setDiagnosisCodes] = useState("");
-
-  const diagnosisCodesFormatting = diagnosisCodes
-    .split(",")
-    .map((code) => code.trim())
-    .filter((code) => code !== "");
+  const [diagnosisCodes, setDiagnosisCodes] = useState<string[]>([]);
 
   const submitForm = async (event: SyntheticEvent) => {
     event.preventDefault();
@@ -41,7 +51,7 @@ const HealthCheckForm = ({ patientId, onEntryAdded }: HealthCheckFormProps) => {
       specialist,
       type: "HealthCheck",
       healthCheckRating: ratingNum,
-      diagnosisCodes: diagnosisCodesFormatting,
+      diagnosisCodes: diagnosisCodes,
     };
     try {
       await patientService.addEntry(patientId, newEntry);
@@ -50,7 +60,7 @@ const HealthCheckForm = ({ patientId, onEntryAdded }: HealthCheckFormProps) => {
       setDate("");
       setSpecialist("");
       setRating("");
-      setDiagnosisCodes("");
+      setDiagnosisCodes([]);
     } catch (error) {
       console.log("ADD ENTRY ERROR:", error);
       setError("Invalid input");
@@ -61,7 +71,7 @@ const HealthCheckForm = ({ patientId, onEntryAdded }: HealthCheckFormProps) => {
     setDate("");
     setSpecialist("");
     setRating("");
-    setDiagnosisCodes("");
+    setDiagnosisCodes([]);
   };
   return (
     <Paper sx={{ paddingY: 3 }}>
@@ -95,6 +105,7 @@ const HealthCheckForm = ({ patientId, onEntryAdded }: HealthCheckFormProps) => {
           label="Date"
           fullWidth
           margin="normal"
+          type="date"
           value={date}
           onChange={(event) => setDate(event.target.value)}
         />
@@ -105,27 +116,46 @@ const HealthCheckForm = ({ patientId, onEntryAdded }: HealthCheckFormProps) => {
           value={specialist}
           onChange={(event) => setSpecialist(event.target.value)}
         />
-        <TextField
-          label="HealthCheck rating"
-          type="number"
-          fullWidth
-          margin="normal"
-          value={rating}
-          onChange={(event) => setRating(event.target.value)}
-          slotProps={{
-            htmlInput: {
-              min: 0,
-              max: 3,
-            },
-          }}
-        />
-        <TextField
-          label="Diagnosis codes (comma-separated)"
-          fullWidth
-          margin="normal"
-          value={diagnosisCodes}
-          onChange={(event) => setDiagnosisCodes(event.target.value)}
-        />
+        <FormControl fullWidth margin="normal">
+          <InputLabel id="health-check-rating-label">
+            Health Check Rating
+          </InputLabel>
+
+          <Select
+            labelId="health-check-rating-label"
+            value={rating}
+            label="HealthCheck rating"
+            onChange={(event) => setRating(event.target.value)}
+          >
+            <MenuItem value={HealthCheckRating.Healthy}>0 is Healthy</MenuItem>
+            <MenuItem value={HealthCheckRating.LowRisk}>1 is Low risk</MenuItem>
+            <MenuItem value={HealthCheckRating.HighRisk}>
+              2 is High risk
+            </MenuItem>
+            <MenuItem value={HealthCheckRating.CriticalRisk}>
+              3 is Critical risk
+            </MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl fullWidth margin="normal">
+          <InputLabel id="diagnosis-codes-label">Diagnosis codes</InputLabel>
+
+          <Select
+            labelId="diagnosis-codes-label"
+            multiple
+            value={diagnosisCodes}
+            label="Diagnosis codes"
+            onChange={(event) =>
+              setDiagnosisCodes(event.target.value as string[])
+            }
+          >
+            {diagnoses.map((diagnosis) => (
+              <MenuItem key={diagnosis.code} value={diagnosis.code}>
+                {diagnosis.code}-{diagnosis.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         <div style={{ display: "flex", gap: "5px" }}>
           <Button type="submit" variant="contained">
             ADD

@@ -23,7 +23,6 @@ interface DiagnosesProps {
   diagnoses: Diagnosis[];
 }
 const PatientInfo = ({ diagnoses }: DiagnosesProps) => {
-  console.log(diagnoses);
   const [patient, setPatient] = useState<Patient | null>(null);
   const [entryType, setEntryType] = useState<
     "HealthCheck" | "Hospital" | "OccupationalHealthcare" | null
@@ -107,17 +106,26 @@ const PatientInfo = ({ diagnoses }: DiagnosesProps) => {
       </FormControl>
 
       {entryType === "HealthCheck" && (
-        <HealthCheckForm patientId={patient.id} onEntryAdded={updateUI} />
+        <HealthCheckForm
+          patientId={patient.id}
+          onEntryAdded={updateUI}
+          diagnoses={diagnoses}
+        />
       )}
 
       {entryType === "Hospital" && (
-        <HospitalForm patientId={patient.id} onEntryAdded={updateUI} />
+        <HospitalForm
+          patientId={patient.id}
+          onEntryAdded={updateUI}
+          diagnoses={diagnoses}
+        />
       )}
 
       {entryType === "OccupationalHealthcare" && (
         <OccupationalHealthcareForm
           patientId={patient.id}
           onEntryAdded={updateUI}
+          diagnoses={diagnoses}
         />
       )}
     </Paper>

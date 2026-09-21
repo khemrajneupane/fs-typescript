@@ -1,16 +1,28 @@
-import { Box, Button, Paper, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  TextField,
+  Typography,
+} from "@mui/material";
 import ErrorIcon from "@mui/icons-material/Error";
 import { useState, type SyntheticEvent } from "react";
-import { OccupationalHealthcareEntry } from "../../types";
+import { Diagnosis, OccupationalHealthcareEntry } from "../../types";
 import patientService from "../../services/patients";
 
 interface OccupationalHealthcareFormProps {
   patientId: string;
   onEntryAdded: () => void;
+  diagnoses: Diagnosis[];
 }
 const OccupationalHealthcareForm = ({
   patientId,
   onEntryAdded,
+  diagnoses,
 }: OccupationalHealthcareFormProps) => {
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
@@ -18,13 +30,8 @@ const OccupationalHealthcareForm = ({
   const [employerName, setEmployerName] = useState("");
   const [sickLeaveStartDate, setSickLeaveStartDate] = useState("");
   const [sickLeaveEndDate, setSickLeaveEndDate] = useState("");
-  const [diagnosisCodes, setDiagnosisCodes] = useState("");
+  const [diagnosisCodes, setDiagnosisCodes] = useState<string[]>([]);
   const [error, setError] = useState("");
-
-  const diagnosisCodesFormatting = diagnosisCodes
-    .split(",")
-    .map((code) => code.trim())
-    .filter((code) => code !== "");
 
   const submitForm = async (event: SyntheticEvent) => {
     event.preventDefault();
@@ -46,7 +53,7 @@ const OccupationalHealthcareForm = ({
       specialist,
       employerName,
       type: "OccupationalHealthcare",
-      diagnosisCodes: diagnosisCodesFormatting,
+      diagnosisCodes: diagnosisCodes,
     };
     if (sickLeaveStartDate && sickLeaveEndDate) {
       newEntry.sickLeave = {
@@ -61,7 +68,7 @@ const OccupationalHealthcareForm = ({
       setDate("");
       setSpecialist("");
       setEmployerName("");
-      setDiagnosisCodes("");
+      setDiagnosisCodes([]);
       setSickLeaveStartDate("");
       setSickLeaveEndDate("");
     } catch (error) {
@@ -73,7 +80,7 @@ const OccupationalHealthcareForm = ({
     setDescription("");
     setDate("");
     setSpecialist("");
-    setDiagnosisCodes("");
+    setDiagnosisCodes([]);
     setEmployerName("");
     setSickLeaveStartDate("");
     setSickLeaveEndDate("");
@@ -112,6 +119,7 @@ const OccupationalHealthcareForm = ({
           label="Date"
           fullWidth
           margin="normal"
+          type="date"
           value={date}
           onChange={(event) => setDate(event.target.value)}
         />
@@ -131,7 +139,7 @@ const OccupationalHealthcareForm = ({
         />
         <TextField
           label="Sick Leave Start Date"
-          type="text"
+          type="date"
           fullWidth
           margin="normal"
           value={sickLeaveStartDate}
@@ -141,9 +149,29 @@ const OccupationalHealthcareForm = ({
           label="Sick Leave End Date"
           fullWidth
           margin="normal"
+          type="date"
           value={sickLeaveEndDate}
           onChange={(event) => setSickLeaveEndDate(event.target.value)}
         />
+        <FormControl fullWidth margin="normal">
+          <InputLabel id="diagnosis-codes-label">Diagnosis codes</InputLabel>
+
+          <Select
+            labelId="diagnosis-codes-label"
+            multiple
+            value={diagnosisCodes}
+            label="Diagnosis codes"
+            onChange={(event) =>
+              setDiagnosisCodes(event.target.value as string[])
+            }
+          >
+            {diagnoses.map((diagnosis) => (
+              <MenuItem key={diagnosis.code} value={diagnosis.code}>
+                {diagnosis.code}-{diagnosis.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         <div style={{ display: "flex", gap: "5px" }}>
           <Button type="submit" variant="contained">
             ADD

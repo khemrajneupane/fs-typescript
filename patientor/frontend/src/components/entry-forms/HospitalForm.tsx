@@ -1,26 +1,36 @@
-import { Box, Button, Paper, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  TextField,
+  Typography,
+} from "@mui/material";
 import ErrorIcon from "@mui/icons-material/Error";
 import { useState, type SyntheticEvent } from "react";
-import { HospitalEntry } from "../../types";
+import { Diagnosis, HospitalEntry } from "../../types";
 import patientService from "../../services/patients";
 
 interface HospitalFormProps {
   patientId: string;
   onEntryAdded: () => void;
+  diagnoses: Diagnosis[];
 }
-const HospitalForm = ({ patientId, onEntryAdded }: HospitalFormProps) => {
+const HospitalForm = ({
+  patientId,
+  onEntryAdded,
+  diagnoses,
+}: HospitalFormProps) => {
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
   const [specialist, setSpecialist] = useState("");
   const [dischargeDate, setDischargeDate] = useState("");
   const [dischargeCriteria, setDischargeCriteria] = useState("");
   const [error, setError] = useState("");
-  const [diagnosisCodes, setDiagnosisCodes] = useState("");
-
-  const diagnosisCodesFormatting = diagnosisCodes
-    .split(",")
-    .map((code) => code.trim())
-    .filter((code) => code !== "");
+  const [diagnosisCodes, setDiagnosisCodes] = useState<string[]>([]);
 
   const submitForm = async (event: SyntheticEvent) => {
     event.preventDefault();
@@ -40,7 +50,7 @@ const HospitalForm = ({ patientId, onEntryAdded }: HospitalFormProps) => {
       date,
       specialist,
       type: "Hospital",
-      diagnosisCodes: diagnosisCodesFormatting,
+      diagnosisCodes: diagnosisCodes,
       discharge: {
         date: dischargeDate,
         criteria: dischargeCriteria,
@@ -53,7 +63,7 @@ const HospitalForm = ({ patientId, onEntryAdded }: HospitalFormProps) => {
       setDate("");
       setSpecialist("");
       setDischargeDate("");
-      setDiagnosisCodes("");
+      setDiagnosisCodes([]);
       setDischargeCriteria("");
     } catch (error) {
       console.log("ADD ENTRY ERROR:", error);
@@ -65,7 +75,7 @@ const HospitalForm = ({ patientId, onEntryAdded }: HospitalFormProps) => {
     setDate("");
     setSpecialist("");
     setDischargeDate("");
-    setDiagnosisCodes("");
+    setDiagnosisCodes([]);
     setDischargeCriteria("");
   };
   return (
@@ -100,6 +110,7 @@ const HospitalForm = ({ patientId, onEntryAdded }: HospitalFormProps) => {
           label="Date"
           fullWidth
           margin="normal"
+          type="date"
           value={date}
           onChange={(event) => setDate(event.target.value)}
         />
@@ -114,6 +125,7 @@ const HospitalForm = ({ patientId, onEntryAdded }: HospitalFormProps) => {
           label="Discharge date"
           fullWidth
           margin="normal"
+          type="date"
           value={dischargeDate}
           onChange={(event) => setDischargeDate(event.target.value)}
         />
@@ -125,13 +137,25 @@ const HospitalForm = ({ patientId, onEntryAdded }: HospitalFormProps) => {
           value={dischargeCriteria}
           onChange={(event) => setDischargeCriteria(event.target.value)}
         />
-        <TextField
-          label="Diagnosis codes (comma-separated)"
-          fullWidth
-          margin="normal"
-          value={diagnosisCodes}
-          onChange={(event) => setDiagnosisCodes(event.target.value)}
-        />
+        <FormControl fullWidth margin="normal">
+          <InputLabel id="diagnosis-codes-label">Diagnosis codes</InputLabel>
+
+          <Select
+            labelId="diagnosis-codes-label"
+            multiple
+            value={diagnosisCodes}
+            label="Diagnosis codes"
+            onChange={(event) =>
+              setDiagnosisCodes(event.target.value as string[])
+            }
+          >
+            {diagnoses.map((diagnosis) => (
+              <MenuItem key={diagnosis.code} value={diagnosis.code}>
+                {diagnosis.code}-{diagnosis.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         <div style={{ display: "flex", gap: "5px" }}>
           <Button type="submit" variant="contained">
             ADD
